@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10130f">
+<title>OnLife Afro | La cifra y la voz · RA 3D</title>
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+<style>
+:root{--ink:#10130f;--panel:rgba(16,19,15,.88);--gold:#e5ad19;--green:#176344;--cream:#fffaf0;--muted:#d9ded8;--red:#c34332}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#10130f;color:white}
+a-scene{position:fixed!important;inset:0!important}
+#ui{position:fixed;inset:0;z-index:10;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#ui button,#ui section,#ui .interactive{pointer-events:auto}
+.top{display:flex;align-items:center;gap:12px;margin:12px;background:var(--panel);border:1px solid #ffffff25;border-radius:18px;padding:10px 14px;backdrop-filter:blur(16px);box-shadow:0 10px 35px #0004}
+.logo{width:54px;height:42px;object-fit:contain;flex:0 0 auto}
+.brand{min-width:0;flex:1}.brand b{display:block;font-size:15px;letter-spacing:.08em}.brand span{display:block;color:#d3d9d1;font-size:12px;margin-top:2px}
+.live{font-size:11px;text-transform:uppercase;letter-spacing:.08em;border:1px solid #e5ad1980;border-radius:999px;padding:7px 9px;color:#ffd45c;white-space:nowrap}
+#hint{margin:0 12px auto;background:var(--panel);border:1px solid #ffffff20;border-radius:14px;padding:11px 14px;font-size:14px;line-height:1.4;color:#f6f5ef;max-width:700px;align-self:center;text-align:center;backdrop-filter:blur(12px)}
+.bottom{padding:18px 12px 14px;background:linear-gradient(transparent,rgba(0,0,0,.82));}
+#subs{display:none;max-width:760px;margin:0 auto 12px;background:#080a08eF;border:1px solid #e5ad19a0;border-radius:14px;padding:12px 16px;text-align:center;font-size:clamp(15px,3.8vw,20px);line-height:1.4;box-shadow:0 8px 28px #0006}
+.actions{display:flex;justify-content:center;align-items:stretch;flex-wrap:wrap;gap:8px;max-width:760px;margin:auto}
+button{font:inherit;font-weight:700;border:1px solid #ffffff24;border-radius:13px;min-height:47px;padding:11px 15px;background:var(--gold);color:#15140d;cursor:pointer;box-shadow:0 5px 16px #0003;transition:transform .15s,filter .15s}
+button:hover{filter:brightness(1.07)}button:active{transform:scale(.98)}button.secondary{background:#f9f7ef;color:#171914}button.dark{background:#242923;color:#fff}
+button:focus-visible{outline:3px solid white;outline-offset:3px}
+#panel{display:none;position:absolute;pointer-events:auto;inset:84px 12px 118px;max-width:760px;margin:auto;overflow:auto;background:var(--cream);color:#20231f;border-radius:22px;padding:22px;border:1px solid #ffffff80;box-shadow:0 24px 80px #0009}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--green)}
+#panel h2{font-size:clamp(24px,5vw,34px);line-height:1.1;margin:8px 0 14px;color:#143f2e}
+#panel p,#panel li{font-size:16px;line-height:1.55}
+#panel .key{background:#f5e8c3;border-left:5px solid var(--gold);border-radius:10px;padding:12px 14px;font-weight:700}
+#panel .src{font-size:12px;color:#5f655e;border-top:1px solid #d9d9cf;padding-top:12px}
+#panel .close{width:100%;margin-top:12px}
+#transcript{display:none;border-top:1px solid #ddd;padding-top:8px}
+#trbtn{background:#e6eee7;color:#183c2c;box-shadow:none}
+@media(max-width:480px){.top{margin:8px;padding:9px 11px;gap:9px}.logo{width:43px;height:35px}.brand b{font-size:13px}.brand span{font-size:11px}.live{font-size:9px;padding:6px}.bottom{padding:12px 8px 10px}.actions{gap:6px}button{font-size:13px;padding:10px 11px;min-height:44px}#hint{font-size:13px;margin:0 8px}#panel{inset:72px 8px 112px;padding:18px}}
+</style>
+</head>
+<body>
+<a-scene mindar-image="imageTargetSrc: ./target.mind; autoStart: true; uiScanning: no; uiLoading: no; filterMinCF:0.0001; filterBeta:0.001;"
+ color-space="sRGB" renderer="colorManagement: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+ <a-assets timeout="10000">
+  <!-- Native A-Frame geometry is used for the 3D overlay; no external model download is required. -->
+  <a-mixin id="goldMaterial" material="color:#e5ad19; metalness:0.55; roughness:0.28"></a-mixin>
+  <a-mixin id="greenMaterial" material="color:#29a879; metalness:0.25; roughness:0.35"></a-mixin>
+ </a-assets>
+ <a-camera position="0 0 0" look-controls="enabled:false" cursor="fuse:false;rayOrigin:mouse;" raycaster="far:10000;objects:.clickable"></a-camera>
+ <a-entity id="card" mindar-image-target="targetIndex: 0">
+  <!-- Floating OnLife Afro data emblem: attached to the real card target, so it appears only after recognition. -->
+  <a-entity id="dataEmblem" position="0 0.67 0.06">
+   <a-torus radius="0.105" radius-tubular="0.014" color="#e5ad19"
+     animation="property:rotation;to:0 360 0;dur:7000;loop:true;easing:linear"></a-torus>
+   <a-sphere radius="0.045" color="#29a879" position="0 0 0.015"
+     animation="property:position;from:0 -0.025 0.015;to:0 0.035 0.015;dur:1100;dir:alternate;loop:true;easing:easeInOutSine"></a-sphere>
+   <a-box position="-0.20 -0.11 0" width="0.035" height="0.12" depth="0.035" color="#176344"
+     animation="property:scale;from:1 0.8 1;to:1 1.15 1;dur:1200;dir:alternate;loop:true"></a-box>
+   <a-box position="-0.145 -0.08 0" width="0.035" height="0.18" depth="0.035" color="#e5ad19"
+     animation="property:scale;from:1 0.8 1;to:1 1.12 1;dur:1400;dir:alternate;loop:true"></a-box>
+   <a-box position="-0.09 -0.06 0" width="0.035" height="0.22" depth="0.035" color="#c34332"
+     animation="property:scale;from:1 0.75 1;to:1 1.12 1;dur:1000;dir:alternate;loop:true"></a-box>
+  </a-entity>
+  <a-entity id="hotspot" class="clickable" position="0.279 0.02 0.04">
+   <a-circle radius="0.07" color="#e5ad19" opacity=".98" animation="property:scale;from:1 1 1;to:1.25 1.25 1;dur:900;dir:alternate;loop:true;easing:easeInOutQuad"></a-circle>
+   <a-text value="?" align="center" color="#111" width="1.1" position="0 0 0.015"></a-text>
+  </a-entity>
+ </a-entity>
+</a-scene>
+<div id="ui">
+ <header class="top">
+  <img class="logo" src="./logo-onlife-afro.png" alt="Logo OnLife Afro">
+  <div class="brand"><b>ONLIFE AFRO</b><span>Datos · Territorio · Comunidad · Transformación</span></div>
+  <span class="live">Experiencia RA</span>
+ </header>
+ <div id="hint" role="status" aria-live="polite">Apunta la cámara a la tarjeta de asistencia escolar. Si no se abre la cámara, publica esta carpeta en un sitio HTTPS.</div>
+ <section id="panel" role="dialog" aria-modal="true" aria-labelledby="ptitle">
+  <div class="eyebrow">Mirar más allá de la cifra</div>
+  <h2 id="ptitle">¿Qué falta en este dato?</h2>
+  <p class="key">«Sin dato» significa que la cifra no está disponible en la fuente consultada. No equivale a cero.</p>
+  <p>Este gráfico ayuda a explorar una realidad territorial, pero no cuenta toda la historia. La cifra por sí sola no explica:</p>
+  <ul>
+   <li>Por qué algunos jóvenes dejan de asistir a la escuela.</li>
+   <li>Qué barreras viven las familias y las comunidades.</li>
+   <li>Qué ha cambiado después de 2018.</li>
+   <li>Las experiencias que no aparecen en los registros disponibles.</li>
+  </ul>
+  <p><strong>La pregunta para la comunidad:</strong> ¿qué información y qué voces necesitamos para comprender mejor esta realidad?</p>
+  <p class="src">Fuente indicada en la tarjeta: DANE, CNPV 2018, Visor de Territorios Colectivos de Comunidades Negras (2021b). Población NARP de Buenaventura de 5 años y más. Elaboración propia. La narración es una lectura de los datos, no un testimonio comunitario.</p>
+  <button id="trbtn">Leer la narración completa</button>
+  <div id="transcript"></div>
+  <button class="close" id="close">Volver a la cámara</button>
+ </section>
+ <footer class="bottom">
+  <div id="subs" aria-live="polite"></div>
+  <div class="actions">
+   <button id="play">▶ Escuchar relato</button>
+   <button id="cc" class="secondary" aria-pressed="true">Subtítulos: sí</button>
+   <button id="ask" class="dark">¿Qué falta?</button>
+  </div>
+ </footer>
+</div>
+<audio id="nar" src="./narracion.mp3" preload="metadata"></audio>
+<script>
+const LINES=[
+ "Esta es mi lectura de la asistencia escolar en Buenaventura, en 2018.",
+ "En básica, la asistencia supera el noventa por ciento.",
+ "De los dieciséis a los diecisiete años, baja al setenta y siete coma cuatro por ciento.",
+ "Y de los dieciocho a los veinticuatro, a treinta y cinco coma ocho.",
+ "Son datos del DANE, no la voz de un participante.",
+ "Toca el signo de pregunta: ¿qué falta en este dato?"
+];
+const $=id=>document.getElementById(id), audio=$('nar'), play=$('play'), subs=$('subs'), hint=$('hint'), panel=$('panel');
+let showSubs=true, synthActive=false, lineIndex=0, starts=[];
+$('transcript').innerHTML=LINES.map(t=>'<p>'+t+'</p>').join('');
+function status(msg){hint.textContent=msg}
+function showLine(i){if(!showSubs||i<0||i>=LINES.length){subs.style.display='none';return}subs.textContent=LINES[i];subs.style.display='block'}
+function computeStarts(){if(!Number.isFinite(audio.duration)||!audio.duration)return;let w=LINES.map(x=>x.split(/\s+/).length),total=w.reduce((a,b)=>a+b,0),t=0;starts=w.map(n=>{let s=t;t+=audio.duration*n/total;return s})}
+audio.addEventListener('loadedmetadata',computeStarts);
+audio.addEventListener('timeupdate',()=>{if(!starts.length)computeStarts();let i=-1;starts.forEach((s,k)=>{if(audio.currentTime>=s)i=k});showLine(i)});
+audio.addEventListener('ended',()=>{play.textContent='▶ Escuchar relato';setTimeout(()=>showLine(-1),1800)});
+audio.addEventListener('error',()=>{status('No se encontró narracion.mp3. Puedes usar la voz automática o leer el relato; el MP3 debe llamarse exactamente narracion.mp3.');play.textContent='▶ Escuchar relato'});
+function stopSpeech(){if('speechSynthesis'in window)window.speechSynthesis.cancel();synthActive=false}
+function speakNext(){if(!synthActive||lineIndex>=LINES.length){synthActive=false;play.textContent='▶ Escuchar relato';return}
+ const u=new SpeechSynthesisUtterance(LINES[lineIndex]);u.lang='es-CO';u.rate=.92;u.pitch=1;
+ u.onstart=()=>showLine(lineIndex);
+ u.onend=()=>{lineIndex++;speakNext()};
+ u.onerror=()=>{synthActive=false;play.textContent='Leer relato';status('La voz automática no está disponible en este navegador. Usa “Leer relato” para mostrar el texto.');showLine(lineIndex)};
+ window.speechSynthesis.speak(u);
+}
+function playNarration(){
+ if(synthActive){stopSpeech();play.textContent='▶ Escuchar relato';return}
+ if(!audio.error && audio.readyState>=2 && audio.querySelector('source')!==null){/* kept for compatibility */}
+ if(!audio.error && audio.readyState>=2 && audio.duration>0){
+   if(!audio.paused){audio.pause();return}
+   audio.play().then(()=>{play.textContent='❚❚ Pausar'}).catch(()=>fallbackSpeech());return;
+ }
+ // Try the MP3 even if metadata has not loaded yet; fall back if the file is missing.
+ audio.play().then(()=>{play.textContent='❚❚ Pausar'}).catch(()=>fallbackSpeech());
+}
+function fallbackSpeech(){
+ if('speechSynthesis'in window){stopSpeech();lineIndex=0;synthActive=true;status('Reproduciendo voz automática del navegador. Para usar tu voz grabada, coloca narracion.mp3 junto a index.html.');play.textContent='❚❚ Pausar';speakNext()}
+ else{status('No hay MP3 y este navegador no ofrece voz automática. Pulsa “Leer relato”.');play.textContent='Leer relato';showLine(0)}
+}
+play.addEventListener('click',playNarration);
+audio.addEventListener('play',()=>{play.textContent='❚❚ Pausar'});
+audio.addEventListener('pause',()=>{if(!audio.ended)play.textContent='▶ Escuchar relato'});
+$('cc').addEventListener('click',()=>{showSubs=!showSubs;$('cc').textContent='Subtítulos: '+(showSubs?'sí':'no');$('cc').setAttribute('aria-pressed',String(showSubs));if(!showSubs)subs.style.display='none';else if(synthActive)showLine(lineIndex)});
+function openPanel(){panel.style.display='block'}
+$('ask').addEventListener('click',openPanel);$('close').addEventListener('click',()=>panel.style.display='none');
+$('trbtn').addEventListener('click',()=>{let t=$('transcript'),open=t.style.display==='block';t.style.display=open?'none':'block';$('trbtn').textContent=open?'Leer la narración completa':'Ocultar narración'});
+document.addEventListener('DOMContentLoaded',()=>{
+ $('hotspot').addEventListener('click',openPanel);
+ const scene=document.querySelector('a-scene');
+ const target=$('card');
+ target.addEventListener('targetFound',()=>status('¡Tarjeta reconocida! Escucha el relato o abre “¿Qué falta?” para explorar lo que la cifra no cuenta.'));
+ target.addEventListener('targetLost',()=>status('Tarjeta fuera de vista. Centra toda la tarjeta, evita reflejos y busca una luz uniforme.'));
+ scene.addEventListener('arReady',()=>status('Cámara activa. Apunta al frente completo de la tarjeta RA de OnLife Afro.'));
+ scene.addEventListener('arError',()=>status('No se pudo iniciar la realidad aumentada. Comprueba el permiso de cámara y que target.mind esté junto a index.html.'));
+ // Give the camera and tracker a moment to initialise; if no AR-ready event arrives, show a useful hint.
+ setTimeout(()=>{ if(!target.hasAttribute('data-target-found')) status('Buscando la tarjeta… Mantén la tarjeta completa dentro de la cámara, con buena luz y sin reflejos.'); },4500);
+});
+window.addEventListener('beforeunload',stopSpeech);
+</script>
+</body>
+</html>
