@@ -1,0 +1,28 @@
+ONLIFE AFRO — LA CIFRA Y LA VOZ (REALIDAD AUMENTADA)
+
+ARCHIVOS DEL PAQUETE
+- index.html: interfaz y lógica de la experiencia.
+- target.mind: archivo de seguimiento compilado por MindAR.
+- RA_tarjeta_A6.png: tarjeta que debes imprimir o mostrar a la cámara.
+- logo-onlife-afro.png: identidad visual de OnLife Afro.
+- narracion.mp3: añade aquí tu grabación de voz (opcional; si falta, el navegador intenta voz automática).
+
+PUBLICAR EN GITHUB PAGES
+1. Sube TODOS estos archivos al nivel raíz del repositorio.
+2. El archivo de seguimiento debe llamarse exactamente target.mind (sin s final).
+3. El audio grabado debe llamarse exactamente narracion.mp3 (sin tilde) y estar al lado de index.html.
+4. En GitHub: Settings > Pages > Deploy from a branch > main > /(root) > Save.
+5. Abre la URL https://USUARIO.github.io/REPOSITORIO/ en el teléfono.
+6. Permite el acceso a la cámara y apunta a la tarjeta completa RA_tarjeta_A6.png.
+
+SI NO RECONOCE LA TARJETA
+- Comprueba que target.mind se generó desde exactamente la misma imagen RA_tarjeta_A6.png que muestras a la cámara.
+- Mantén la tarjeta entera en el encuadre, con luz uniforme y sin reflejos.
+- Prueba con una copia impresa; algunas pantallas reflejan o generan patrones que dificultan el seguimiento.
+- Recarga la página tras subir/reemplazar target.mind.
+- Si cambias el diseño de la tarjeta, debes compilar de nuevo target.mind.
+
+NOTAS
+- No incluimos un archivo narracion.mp3 porque no se proporcionó el audio grabado en los archivos disponibles. El navegador puede intentar la voz automática como alternativa.
+- La página necesita conexión a internet para cargar las bibliotecas de A-Frame y MindAR desde CDN.
+- Prueba en el teléfono real antes de presentar el proyecto; el funcionamiento de cámara y audio depende del navegador y del dispositivo.
