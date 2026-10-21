@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10130f">
+<title>OnLife Afro | La cifra y la voz · RA</title>
+<script>
+/* Loads A-Frame then MindAR: local file first (works offline), CDN as backup. */
+(function(){
+ function load(srcs){return new Promise((res,rej)=>{let i=0;(function next(){
+   if(i>=srcs.length)return rej(new Error('No se pudo cargar '+srcs[0]));
+   const s=document.createElement('script');s.src=srcs[i++];s.onload=res;s.onerror=()=>{s.remove();next()};document.head.appendChild(s)})()})}
+ window.libsReady=load(['./aframe-v1.5.0.min.js','https://cdn.jsdelivr.net/npm/aframe@1.5.0/dist/aframe-v1.5.0.min.js'])
+  .then(()=>load(['./mindar-image-aframe.prod.js','https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js']));
+})();
+</script>
+<style>
+:root{--ink:#10130f;--panel:rgba(16,19,15,.88);--gold:#e5ad19;--green:#176344;--cream:#fffaf0;--red:#c34332}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:#10130f;color:#fff}
+body.cam-on,html.cam-on{background:transparent}
+a-scene{position:fixed!important;inset:0!important;background:transparent!important}
+a-scene canvas.a-canvas{background:transparent!important}
+a-scene video{object-fit:cover}
+#ui{position:fixed;inset:0;z-index:10;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#ui button{pointer-events:auto}
+.top{display:flex;align-items:center;gap:10px;margin:12px;background:var(--panel);border:1px solid #ffffff25;border-radius:18px;padding:10px 14px;backdrop-filter:blur(16px)}
+.logo{width:54px;height:27px;object-fit:contain;flex:0 0 auto}
+.brand{min-width:0;flex:1}.brand b{display:block;font-size:15px;letter-spacing:.08em}.brand span{display:block;color:#d3d9d1;font-size:12px;margin-top:2px}
+#hint{margin:0 12px auto;background:linear-gradient(135deg,rgba(16,19,15,.92),rgba(22,45,32,.82));border:1px solid #e5ad1940;border-radius:14px;padding:11px 14px;font-size:14px;line-height:1.4;max-width:700px;align-self:center;text-align:center}
+.bottom{padding:18px 12px 14px;background:linear-gradient(transparent,rgba(0,0,0,.82))}
+.subs{display:none;max-width:760px;margin:0 auto 12px;background:#080a08ef;border:1px solid #e5ad19a0;border-radius:14px;padding:12px 16px;text-align:center;font-size:clamp(15px,3.8vw,20px);line-height:1.4}
+.actions{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;max-width:760px;margin:auto}
+button{font:inherit;font-weight:700;border:1px solid #ffffff24;border-radius:13px;min-height:47px;padding:11px 15px;background:var(--gold);color:#15140d;cursor:pointer}
+button:active{transform:scale(.98)}
+button.secondary{background:#f9f7ef;color:#171914}
+button.dark{background:linear-gradient(135deg,#28332b,#171b17);color:#fff}
+button:focus-visible{outline:3px solid #fff;outline-offset:3px}
+button:disabled{opacity:.7}
+
+/* Info panel: above everything (also above the no-camera view) */
+#panel{display:none;position:fixed;z-index:40;inset:72px 12px 24px;max-width:760px;margin:auto;overflow:auto;background:var(--cream);color:#20231f;border-radius:22px;padding:22px;box-shadow:0 24px 80px #0009}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.15em;text-transform:uppercase;color:var(--green)}
+#panel h2{font-size:clamp(24px,5vw,34px);line-height:1.1;margin:8px 0 14px;color:#143f2e}
+#panel p,#panel li{font-size:16px;line-height:1.55}
+#panel .key{background:#f5e8c3;border-left:5px solid var(--gold);border-radius:10px;padding:12px 14px;font-weight:700}
+#panel .src{font-size:12px;color:#5f655e;border-top:1px solid #d9d9cf;padding-top:12px}
+#panel .close{width:100%;margin-top:12px;position:sticky;bottom:0}
+#transcript{display:none;border-top:1px solid #ddd;padding-top:8px}
+#trbtn{background:#e6eee7;color:#183c2c}
+
+/* Start screen (gate) */
+#gate{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,12,10,.94);overflow:auto}
+.card{width:100%;max-width:520px;background:#161a15;border:1px solid #ffffff22;border-radius:22px;padding:22px}
+.card img.big{width:150px;max-width:50%;display:block;margin:0 auto 10px}
+.card h1{font-size:clamp(22px,6vw,30px);line-height:1.15;margin:4px 0 6px;text-align:center}
+.card .sub{text-align:center;color:#cfd6cd;font-size:14px;margin:0 0 14px}
+.card ol{padding-left:22px;margin:0 0 12px}.card li{font-size:15.5px;line-height:1.5;margin:4px 0}
+.card .priv{background:#0e2a1e;border-left:5px solid var(--gold);border-radius:8px;padding:10px 12px;font-size:14px;line-height:1.45;margin:10px 0}
+#gateMsg{display:none;background:#4a1b14;border:1px solid #c34332;border-radius:10px;padding:10px 12px;font-size:14.5px;line-height:1.45;margin:10px 0}
+#gateMsg.warn{background:#3d3210;border-color:var(--gold)}
+.card .row{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+#offline{font-size:12.5px;text-align:center;color:#bfc8bd;margin-top:12px}
+
+/* No-camera view */
+#plain{display:none;position:fixed;inset:0;z-index:25;overflow:auto;background:#10130f;padding:12px 12px 28px}
+#plain .wrap{max-width:520px;margin:0 auto}
+#plain header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+#plain header b{font-size:15px}
+#plain img.chart{width:100%;height:auto;border-radius:12px;display:block;background:#fff}
+#plain .actions{margin:14px 0 10px}
+#plain .subs{margin:0 0 8px}
+#pnote{display:none;font-size:13px;color:#ffd45c;text-align:center;margin:6px 0}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition:none!important}}
+@media(max-width:480px){.top{margin:8px;padding:9px 11px}button{font-size:14px;padding:10px 12px;min-height:46px}#hint{font-size:13px;margin:0 8px}#panel{inset:64px 8px 16px;padding:18px}}
+</style>
+</head>
+<body>
+
+<template id="sceneTpl">
+<a-scene mindar-image="imageTargetSrc: ./target.mind; autoStart: false; uiScanning: no; uiLoading: no; uiError: no; filterMinCF:0.0001; filterBeta:0.001;"
+ color-space="sRGB" renderer="colorManagement: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+ <a-assets timeout="10000">
+  <img id="qimg" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48Y2lyY2xlIGN4PSI1MCIgY3k9IjUwIiByPSI0OCIgZmlsbD0iI2U1YWQxOSIgc3Ryb2tlPSIjMTAxMzBmIiBzdHJva2Utd2lkdGg9IjQiLz48dGV4dCB4PSI1MCIgeT0iNjgiIGZvbnQtZmFtaWx5PSJBcmlhbCxIZWx2ZXRpY2Esc2Fucy1zZXJpZiIgZm9udC1zaXplPSI2MiIgZm9udC13ZWlnaHQ9IjcwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzEwMTMwZiI+PzwvdGV4dD48L3N2Zz4=" alt="">
+ </a-assets>
+ <a-camera position="0 0 0" look-controls="enabled:false" cursor="fuse:false;rayOrigin:mouse;" raycaster="far:10000;objects:.clickable"></a-camera>
+ <a-entity id="card" mindar-image-target="targetIndex: 0">
+  <!-- Decorations (attached to the detected card). They are NOT data. -->
+  <a-entity id="dataEmblem" position="0 0.67 0.06">
+   <a-torus radius="0.105" radius-tubular="0.014" color="#e5ad19" animation="property:rotation;to:0 360 0;dur:7000;loop:true;easing:linear"></a-torus>
+   <a-sphere radius="0.045" color="#29a879" position="0 0 0.015" animation="property:position;from:0 -0.025 0.015;to:0 0.035 0.015;dur:1100;dir:alternate;loop:true;easing:easeInOutSine"></a-sphere>
+  </a-entity>
+  <a-entity id="orbitHalo" position="0 0.48 0.015" animation="property:rotation; to:0 0 360; dur:12000; loop:true; easing:linear">
+   <a-torus radius="0.19" radius-tubular="0.004" color="#29a879" opacity="0.8" material="emissive:#0b4f35; emissiveIntensity:0.6"></a-torus>
+   <a-torus radius="0.235" radius-tubular="0.003" color="#e5ad19" opacity="0.7" rotation="18 0 0" material="emissive:#7a5200; emissiveIntensity:0.45"></a-torus>
+  </a-entity>
+  <!-- Tappable hotspot over the 35,8 % bar: opens «¿Qué falta en este dato?» -->
+  <a-entity id="hotspot" class="clickable" position="0.279 0.02 0.04">
+   <a-image src="#qimg" width="0.15" height="0.15" transparent="true"
+            animation="property:scale;from:1 1 1;to:1.25 1.25 1;dur:900;dir:alternate;loop:true;easing:easeInOutQuad"></a-image>
+  </a-entity>
+ </a-entity>
+</a-scene>
+</template>
+
+<!-- Camera UI -->
+<div id="ui">
+ <header class="top">
+  <img class="logo" src="./logo-onlife-afro.png" alt="Logo OnLife Afro">
+  <div class="brand"><b>ONLIFE AFRO</b><span>La cifra y la voz · RA</span></div>
+  <button id="noCamTop" class="secondary" type="button" style="min-height:40px;padding:8px 11px;font-size:12px">Ver sin cámara</button>
+ </header>
+ <div id="hint" role="status" aria-live="polite">Apunta a la tarjeta completa de asistencia escolar.</div>
+ <footer class="bottom">
+  <div id="subs" class="subs" aria-live="polite"></div>
+  <div class="actions">
+   <button id="play">▶ Escuchar relato</button>
+   <button id="cc" class="secondary" aria-pressed="true">Subtítulos: sí</button>
+   <button id="ask" class="dark">¿Qué falta?</button>
+  </div>
+ </footer>
+</div>
+
+<!-- No-camera view: same content, no AR needed -->
+<main id="plain" aria-label="Versión sin cámara">
+ <div class="wrap">
+  <header><b>La cifra y la voz</b><button id="backToCam" class="secondary" type="button" style="min-height:40px;padding:8px 12px;font-size:13px">Usar la cámara</button></header>
+  <img class="chart" src="./RA_tarjeta_A6.png" alt="Gráfico de barras: asistencia escolar de la población NARP de Buenaventura, 2018. De 7 a 11 años, 95,1 %. De 12 a 15 años, 91,8 %. De 16 a 17 años, 77,4 %. De 18 a 24 años, 35,8 %. Fuente: DANE, Censo Nacional de Población y Vivienda 2018, Visor de Territorios Colectivos de Comunidades Negras.">
+  <div class="actions">
+   <button id="pplay">▶ Escuchar relato</button>
+   <button id="pcc" class="secondary" aria-pressed="true">Subtítulos: sí</button>
+   <button id="pask" class="dark">¿Qué falta?</button>
+  </div>
+  <div id="psubs" class="subs" aria-live="polite"></div>
+  <div id="pnote"></div>
+ </div>
+</main>
+
+<!-- Info panel -->
+<section id="panel" role="dialog" aria-modal="true" aria-labelledby="ptitle">
+ <div class="eyebrow">Mirar más allá de la cifra</div>
+ <h2 id="ptitle">¿Qué falta en este dato?</h2>
+ <p class="key">«Sin dato» significa que la cifra no está disponible en la fuente consultada. No equivale a cero.</p>
+ <p>Este gráfico ayuda a explorar una realidad territorial, pero no cuenta toda la historia. La cifra por sí sola no explica:</p>
+ <ul>
+  <li>Por qué algunos jóvenes dejan de asistir a la escuela.</li>
+  <li>Qué barreras viven las familias y las comunidades.</li>
+  <li>Qué ha cambiado después de 2018.</li>
+  <li>Las experiencias que no aparecen en los registros disponibles.</li>
+ </ul>
+ <p><strong>La pregunta para la comunidad:</strong> ¿qué información y qué voces necesitamos para comprender mejor esta realidad?</p>
+ <p class="src">Fuente: DANE, CNPV 2018, Visor de Territorios Colectivos de Comunidades Negras (2021b). Población NARP de Buenaventura de 5 años y más. Elaboración propia. La narración es una lectura de los datos, no un testimonio comunitario.</p>
+ <button id="trbtn">Leer la narración completa</button>
+ <div id="transcript"></div>
+ <button class="close" id="close">Cerrar</button>
+</section>
+
+<!-- Start screen -->
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gtitle">
+ <div class="card">
+  <img class="big" src="./logo-onlife-afro.png" alt="Logo OnLife Afro">
+  <h1 id="gtitle">La cifra y la voz</h1>
+  <p class="sub">Asistencia escolar · Buenaventura · 2018</p>
+  <ol>
+   <li>Ten a la mano la tarjeta impresa, o ábrela en otra pantalla.</li>
+   <li>Pulsa «Abrir cámara» y permite el acceso.</li>
+   <li>Apunta a la tarjeta completa y con buena luz.</li>
+  </ol>
+  <div class="priv">La cámara solo se usa en tu teléfono para reconocer la tarjeta. Esta página no envía ni guarda tu video.</div>
+  <div id="gateMsg" role="alert"></div>
+  <div class="row">
+   <button id="startCamera" type="button">Abrir cámara</button>
+   <button id="noCam" class="secondary" type="button">Ver sin cámara (gráfico, audio y texto)</button>
+  </div>
+  <div id="offline">Comprobando modo sin conexión…</div>
+ </div>
+</div>
+
+<audio id="nar" src="./narracion.mp3" preload="metadata"></audio>
+
+<script>
+/* Read EXACTLY these lines when you record narracion.mp3; the subtitles are this same text. */
+const LINES=[
+ "Esta es mi lectura de la asistencia escolar en Buenaventura, en 2018.",
+ "En básica, la asistencia supera el noventa por ciento.",
+ "De los dieciséis a los diecisiete años, baja al setenta y siete coma cuatro por ciento.",
+ "Y de los dieciocho a los veinticuatro, a treinta y cinco coma ocho.",
+ "Son datos del DANE, no la voz de un participante.",
+ "Toca el signo de pregunta: ¿qué falta en este dato?"
+];
+const CUE_STARTS=null; /* optional exact start times in seconds after recording, e.g. [0,4.2,7.9,13.5,18,21.4] */
+
+const $=id=>document.getElementById(id);
+const audio=$('nar'), panel=$('panel'), gate=$('gate'), plain=$('plain'), gateMsg=$('gateMsg');
+const playBtns=[$('play'),$('pplay')], ccBtns=[$('cc'),$('pcc')], subEls=[$('subs'),$('psubs')];
+let showSubs=true, synthActive=false, lineIndex=0, starts=[], camState='idle';
+
+$('transcript').innerHTML=LINES.map(t=>'<p>'+t+'</p>').join('');
+const status=m=>{$('hint').textContent=m};
+const setPlay=t=>playBtns.forEach(b=>b.textContent=t);
+function note(msg){const n=$('pnote');n.textContent=msg||'';n.style.display=msg?'block':'none'}
+function showLine(i){subEls.forEach(el=>{ if(!showSubs||i<0||i>=LINES.length){el.style.display='none';return} el.textContent=LINES[i]; el.style.display='block'})}
+function computeStarts(){
+ if(CUE_STARTS){starts=CUE_STARTS;return}
+ if(!Number.isFinite(audio.duration)||!audio.duration)return;
+ const w=LINES.map(x=>x.split(/\s+/).length), tot=w.reduce((a,b)=>a+b,0); let t=0;
+ starts=w.map(n=>{const s=t;t+=audio.duration*n/tot;return s});
+}
+audio.addEventListener('loadedmetadata',computeStarts);
+audio.addEventListener('timeupdate',()=>{if(!starts.length)computeStarts();let i=-1;starts.forEach((s,k)=>{if(audio.currentTime>=s)i=k});showLine(i)});
+audio.addEventListener('ended',()=>{setPlay('▶ Escuchar relato');setTimeout(()=>showLine(-1),1800)});
+audio.addEventListener('play',()=>{setPlay('❚❚ Pausar');note('')});
+audio.addEventListener('pause',()=>{if(!audio.ended)setPlay('▶ Escuchar relato')});
+
+function stopSpeech(){if('speechSynthesis' in window)window.speechSynthesis.cancel();synthActive=false}
+function speakNext(){
+ if(!synthActive||lineIndex>=LINES.length){synthActive=false;setPlay('▶ Escuchar relato');return}
+ const u=new SpeechSynthesisUtterance(LINES[lineIndex]);u.lang='es-CO';u.rate=.92;
+ u.onstart=()=>showLine(lineIndex);
+ u.onend=()=>{lineIndex++;speakNext()};
+ u.onerror=()=>{synthActive=false;setPlay('Leer relato');showLine(lineIndex)};
+ window.speechSynthesis.speak(u);
+}
+function fallbackSpeech(){
+ const msg='No se encontró narracion.mp3: se usa la voz automática del navegador (no es una narración grabada).';
+ status(msg);note(msg);
+ if('speechSynthesis' in window){stopSpeech();lineIndex=0;synthActive=true;setPlay('❚❚ Pausar');speakNext()}
+ else{setPlay('Leer relato');showLine(0)}
+}
+function playNarration(){
+ if(synthActive){stopSpeech();setPlay('▶ Escuchar relato');return}
+ if(!audio.paused&&!audio.ended){audio.pause();return}
+ audio.play().catch(fallbackSpeech);
+}
+playBtns.forEach(b=>b.addEventListener('click',playNarration));
+ccBtns.forEach(b=>b.addEventListener('click',()=>{
+ showSubs=!showSubs; ccBtns.forEach(x=>{x.textContent='Subtítulos: '+(showSubs?'sí':'no');x.setAttribute('aria-pressed',String(showSubs))});
+ if(!showSubs)subEls.forEach(e=>e.style.display='none'); else if(synthActive)showLine(lineIndex);
+}));
+
+function openPanel(){panel.style.display='block'}
+$('ask').addEventListener('click',openPanel); $('pask').addEventListener('click',openPanel);
+$('close').addEventListener('click',()=>panel.style.display='none');
+$('trbtn').addEventListener('click',()=>{const t=$('transcript'),o=t.style.display==='block';t.style.display=o?'none':'block';$('trbtn').textContent=o?'Leer la narración completa':'Ocultar narración'});
+
+/* ---------- Start screen helpers ---------- */
+function gateMessage(text,warn){gateMsg.textContent=text;gateMsg.className=warn?'warn':'';gateMsg.style.display=text?'block':'none'}
+const inApp=/FBAN|FBAV|Instagram|WhatsApp|Line\/|MicroMessenger|Snapchat|TikTok|; wv\)/i.test(navigator.userAgent);
+if(!window.isSecureContext) gateMessage('Esta página no está en una conexión segura (https), así que el navegador bloqueará la cámara. Abre la dirección que empieza con https://, o usa «Ver sin cámara».',false);
+else if(inApp) gateMessage('Parece que abriste el enlace dentro de otra aplicación. Muchas veces eso bloquea la cámara: toca ⋮ o «Compartir» y elige «Abrir en Chrome» o «Abrir en Safari».',true);
+
+function showPlain(){plain.style.display='block';gate.style.display='none';$('ui').style.visibility='hidden'}
+function showCamUI(){plain.style.display='none';$('ui').style.visibility='visible'}
+['noCam','noCamTop'].forEach(id=>$(id).addEventListener('click',showPlain));
+$('backToCam').addEventListener('click',()=>{showCamUI(); if(camState!=='on'){gate.style.display='flex'}});
+
+function explainCameraError(err){
+ const n=(err&&err.name)||'';
+ if(n==='NotAllowedError'||n==='SecurityError'||n==='PermissionDeniedError') return 'El permiso de cámara está bloqueado. Toca el candado (o los ajustes del sitio) junto a la dirección, permite «Cámara» y pulsa Reintentar. Si aun así falla, revisa que el navegador tenga permiso de cámara en los ajustes del teléfono.';
+ if(n==='NotFoundError'||n==='OverconstrainedError') return 'No se encontró una cámara en este dispositivo. Usa «Ver sin cámara».';
+ if(n==='NotReadableError'||n==='AbortError') return 'La cámara está siendo usada por otra aplicación. Ciérrala y pulsa Reintentar.';
+ return 'No se pudo abrir la cámara'+(err&&err.message?': '+err.message:'')+'. Pulsa Reintentar o usa «Ver sin cámara».';
+}
+async function startCamera(){
+ const btn=$('startCamera'); btn.disabled=true; btn.textContent='Abriendo…'; gateMessage('',false);
+ try{
+  if(!window.isSecureContext||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){
+   const e=new Error('Este navegador o esta conexión no permite usar la cámara.');e.name='SecurityError';throw e}
+  /* Ask permission first so we can show a precise error, then hand the camera to MindAR. */
+  const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+  s.getTracks().forEach(t=>t.stop());
+  await new Promise(r=>setTimeout(r,200)); /* let the camera be released before MindAR takes it */
+  const scene=document.querySelector('a-scene'), sys=scene&&scene.systems&&scene.systems['mindar-image-system'];
+  if(!sys||typeof sys.start!=='function'){const e=new Error('La experiencia de RA aún no se cargó. Espera unos segundos y reintenta, o recarga la página.');e.name='LibError';throw e}
+  await sys.start();
+ }catch(err){
+  console.error('Camera start failed:',err);
+  camState='error'; btn.disabled=false; btn.textContent='Reintentar cámara';
+  gate.style.display='flex'; gateMessage(explainCameraError(err),false);
+ }
+}
+$('startCamera').addEventListener('click',startCamera);
+
+function initScene(){
+ document.body.prepend($('sceneTpl').content.cloneNode(true));
+ const scene=document.querySelector('a-scene'), target=$('card');
+ $('hotspot').addEventListener('click',openPanel);
+ scene.addEventListener('arReady',()=>{camState='on';document.body.classList.add('cam-on');gate.style.display='none';showCamUI();status('Cámara activa. Apunta al frente completo de la tarjeta.')});
+ scene.addEventListener('arError',e=>{camState='error';$('startCamera').disabled=false;$('startCamera').textContent='Reintentar cámara';gate.style.display='flex';gateMessage('La cámara no pudo iniciar ('+((e&&e.detail&&e.detail.error)||'error desconocido')+'). Pulsa Reintentar o usa «Ver sin cámara».',false)});
+ target.addEventListener('targetFound',()=>status('¡Tarjeta reconocida! Toca ▶ Escuchar relato o el círculo «?».'));
+ target.addEventListener('targetLost',()=>status('Tarjeta fuera de vista. Centra toda la tarjeta, evita reflejos y busca luz uniforme.'));
+}
+window.libsReady.then(initScene).catch(err=>{
+ console.error(err);
+ $('startCamera').disabled=true;
+ gateMessage('La experiencia de RA no pudo cargarse. Revisa tu conexión y recarga la página, o usa «Ver sin cámara». (Detalle técnico: '+err.message+'. Verifica que los archivos aframe-v1.5.0.min.js y mindar-image-aframe.prod.js estén en la raíz del sitio.)',false);
+});
+window.addEventListener('beforeunload',stopSpeech);
+
+/* ---------- Offline mode (service worker) ---------- */
+(function(){
+ const el=$('offline');
+ if(!('serviceWorker' in navigator)||!window.isSecureContext){el.textContent='Modo sin conexión no disponible en este navegador.';return}
+ navigator.serviceWorker.register('./sw.js').then(()=>navigator.serviceWorker.ready).then(async()=>{
+  const ok=await caches.match('./target.mind')&&await caches.match('./mindar-image-aframe.prod.js');
+  el.textContent=ok?'✓ Listo para usar sin conexión en este teléfono.':'Preparando el modo sin conexión… vuelve a abrir la página.';
+ }).catch(()=>{el.textContent='No se pudo activar el modo sin conexión.'});
+})();
+</script>
+</body>
+</html>
